@@ -69,12 +69,15 @@ class LafzRotationWorker(
     }
 
     private fun fetchNextQuote(): Map<String, String> {
-        val dbFile = context.getDatabasePath("lafz.db")
+        val dbFile = LafzWidgetProvider.findDatabaseFile(context)
         if (dbFile != null && dbFile.exists()) {
             var db: SQLiteDatabase? = null
             try {
                 db = SQLiteDatabase.openDatabase(dbFile.path, null, SQLiteDatabase.OPEN_READONLY)
                 
+                val widgetPrefs = context.getSharedPreferences("lafz_widget_prefs", Context.MODE_PRIVATE)
+                val currentQuote = widgetPrefs.getString("quote", "") ?: ""
+
                 val rotationPrefs = context.getSharedPreferences("lafz_rotation_prefs", Context.MODE_PRIVATE)
                 val rotateMode = rotationPrefs.getString("rotation_mode", "standard")
 
@@ -82,17 +85,36 @@ class LafzRotationWorker(
                     "favorites" -> """
                         SELECT q.text, q.attribution FROM quotes q
                         INNER JOIN favorites f ON q.id = f.quote_id
-                        WHERE f.deleted_at IS NULL
+                        WHERE f.deleted_at IS NULL AND q.text != ?
                         ORDER BY RANDOM() LIMIT 1
                     """.trimIndent()
                     else -> """
                         SELECT text, attribution FROM quotes
-                        WHERE publication_status = 'published'
+                        WHERE publication_status = 'published' AND text != ?
                         ORDER BY RANDOM() LIMIT 1
                     """.trimIndent()
                 }
 
-                val cursor = db.rawQuery(query, null)
+                var cursor = db.rawQuery(query, arrayOf(currentQuote))
+                if (!cursor.moveToFirst()) {
+                    cursor.close()
+                    // Fallback to any published quote without exclusion
+                    val fallbackQuery = when (rotateMode) {
+                        "favorites" -> """
+                            SELECT q.text, q.attribution FROM quotes q
+                            INNER JOIN favorites f ON q.id = f.quote_id
+                            WHERE f.deleted_at IS NULL
+                            ORDER BY RANDOM() LIMIT 1
+                        """.trimIndent()
+                        else -> """
+                            SELECT text, attribution FROM quotes
+                            WHERE publication_status = 'published'
+                            ORDER BY RANDOM() LIMIT 1
+                        """.trimIndent()
+                    }
+                    cursor = db.rawQuery(fallbackQuery, null)
+                }
+
                 if (cursor.moveToFirst()) {
                     val text = cursor.getString(cursor.getColumnIndexOrThrow("text"))
                     val attr = cursor.getString(cursor.getColumnIndexOrThrow("attribution"))
