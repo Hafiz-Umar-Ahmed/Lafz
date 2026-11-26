@@ -23,15 +23,15 @@ Instead of feeds, algorithms, or intrusive notifications, Lafz brings meaning di
 | <img src="assets/images/1.png" width="250" alt="Home Screen" /> | <img src="assets/images/2.png" width="250" alt="Automation Screen" /> | <img src="assets/images/3.png" width="250" alt="Wallpaper Studio Screen" /> |
 | *Daily quote feed & bilingual header* | *Background schedules & Doze status* | *8 presets, typography & safe zones* |
 
-| **4. Basic Timeline Widget** | **5. Quick Rotation Hub** | **6. Live Home Wallpaper** |
+| **4. Basic Timeline Widget** | **5. Quick Rotation Hub** | **6. Basic Widget Customization** |
 |:---:|:---:|:---:|
 | <img src="assets/images/4.png" width="250" alt="Basic Widget" /> | <img src="assets/images/5.png" width="250" alt="Widget Hub" /> | <img src="assets/images/6.png" width="250" alt="Wallpaper Screen - Home Screen" /> |
-| *Ambient home-screen quote tile* | *5-tile native control remote* | *Rendered wallpaper with icon grid* |
+| *Ambient home-screen quote tile* | *5-tile native control remote* | *Live palette, font & layout controls* |
 
 <p align="center">
-  <strong>7. Basic Widget Customization</strong><br>
+  <strong>7. Live Home Wallpaper</strong><br>
   <img src="assets/images/7.png" width="250" alt="Basic Widget Edit Screen" /><br>
-  <em>Live palette, font & layout controls</em>
+  <em>Rendered wallpaper with icon grid</em>
 </p>
 
 ---
