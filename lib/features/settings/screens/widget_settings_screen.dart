@@ -5,7 +5,6 @@ import 'package:lafz/core/models/quote.dart';
 import 'package:lafz/core/models/rotation_settings.dart';
 import 'package:lafz/core/providers/providers.dart';
 import 'package:lafz/core/widgets/apple_grouped_card.dart';
-import 'package:lafz/features/library/widgets/rotation_hub_widget.dart';
 import 'package:lafz/native/native_bridge.dart';
 
 class WidgetSettingsScreen extends ConsumerStatefulWidget {

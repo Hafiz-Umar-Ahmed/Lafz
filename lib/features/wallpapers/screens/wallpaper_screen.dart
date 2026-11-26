@@ -1,7 +1,5 @@
 import 'dart:typed_data';
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:share_plus/share_plus.dart';
@@ -9,6 +7,7 @@ import 'package:lafz/core/enums/enums.dart';
 import 'package:lafz/core/models/quote.dart';
 import 'package:lafz/core/models/wallpaper_settings.dart';
 import 'package:lafz/core/providers/providers.dart';
+import 'package:lafz/core/utils/wallpaper_capture.dart';
 import 'package:lafz/features/wallpapers/widgets/wallpaper_renderer_widget.dart';
 import 'package:lafz/native/native_bridge.dart';
 
@@ -138,26 +137,9 @@ class _WallpaperScreenState extends ConsumerState<WallpaperScreen> {
     }
   }
 
-  /// Captures the clean wallpaper at the phone's real pixel width.
-  Future<Uint8List?> _capturePng() async {
-    try {
-      final boundary =
-          _captureKey.currentContext?.findRenderObject()
-              as RenderRepaintBoundary?;
-      if (boundary == null) return null;
-
-      // The boundary is laid out at the phone's real logical size, so the
-      // device pixel ratio gives the phone's native resolution.
-      final pixelRatio = MediaQuery.of(context).devicePixelRatio;
-
-      await GoogleFonts.pendingFonts();
-      final image = await boundary.toImage(pixelRatio: pixelRatio);
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      return byteData?.buffer.asUint8List();
-    } catch (_) {
-      return null;
-    }
-  }
+  /// Captures the clean wallpaper at a safe native resolution.
+  Future<Uint8List?> _capturePng() =>
+      WallpaperCapture.captureBoundary(_captureKey, context);
 
   void _snack(String message) {
     if (!mounted) return;

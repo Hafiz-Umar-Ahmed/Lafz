@@ -7,18 +7,20 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.os.PowerManager
 import android.provider.Settings
 import androidx.work.*
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
-import java.io.ByteArrayInputStream
 import java.util.concurrent.TimeUnit
 
 class MainActivity : FlutterActivity() {
     private val WALLPAPER_CHANNEL = "com.lafz.lafz/wallpaper"
     private val WIDGET_CHANNEL = "com.lafz.lafz/widget"
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -29,27 +31,54 @@ class MainActivity : FlutterActivity() {
                 "setWallpaper" -> {
                     val imageBytes = call.argument<ByteArray>("image")
                     val destination = call.argument<String>("destination") ?: "lock"
-                    if (imageBytes != null) {
-                        try {
-                            val bitmap = BitmapFactory.decodeStream(ByteArrayInputStream(imageBytes))
-                            val wm = WallpaperManager.getInstance(applicationContext)
-
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                                val flag = when (destination) {
-                                    "home" -> WallpaperManager.FLAG_SYSTEM
-                                    "lock" -> WallpaperManager.FLAG_LOCK
-                                    else -> WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK
+                    if (imageBytes != null && imageBytes.isNotEmpty()) {
+                        Thread {
+                            var bitmap: android.graphics.Bitmap? = null
+                            try {
+                                bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                                if (bitmap == null) {
+                                    mainHandler.post {
+                                        result.error("WALLPAPER_ERROR", "Failed to decode wallpaper image", null)
+                                    }
+                                    return@Thread
                                 }
-                                wm.setBitmap(bitmap, null, true, flag)
-                            } else {
-                                wm.setBitmap(bitmap)
+                                val wm = WallpaperManager.getInstance(applicationContext)
+                                val ok = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                    when (destination) {
+                                        "home" -> wm.setBitmap(bitmap, null, true, WallpaperManager.FLAG_SYSTEM) > 0
+                                        "lock" -> wm.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK) > 0
+                                        else -> {
+                                            val combined = wm.setBitmap(
+                                                bitmap,
+                                                null,
+                                                true,
+                                                WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK
+                                            )
+                                            if (combined > 0) {
+                                                true
+                                            } else {
+                                                // Fallback for OEMs that reject combined flags
+                                                val homeOk = wm.setBitmap(bitmap, null, true, WallpaperManager.FLAG_SYSTEM) > 0
+                                                val lockOk = wm.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK) > 0
+                                                homeOk || lockOk
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    wm.setBitmap(bitmap)
+                                    true
+                                }
+                                mainHandler.post { result.success(ok) }
+                            } catch (e: Exception) {
+                                mainHandler.post {
+                                    result.error("WALLPAPER_ERROR", e.localizedMessage, null)
+                                }
+                            } finally {
+                                bitmap?.recycle()
                             }
-                            result.success(true)
-                        } catch (e: Exception) {
-                            result.error("WALLPAPER_ERROR", e.localizedMessage, null)
-                        }
+                        }.start()
                     } else {
-                        result.error("INVALID_ARGS", "Image bytes cannot be null", null)
+                        result.error("INVALID_ARGS", "Image bytes cannot be null or empty", null)
                     }
                 }
                 "getBatteryOptimizationStatus" -> {

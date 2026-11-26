@@ -1,18 +1,12 @@
-import 'dart:typed_data';
-import 'dart:ui' as ui;
-
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:lafz/core/enums/enums.dart';
-import 'package:lafz/core/models/quote.dart';
 import 'package:lafz/core/models/rotation_settings.dart';
 import 'package:lafz/core/providers/providers.dart';
 import 'package:lafz/core/utils/rotation_engine.dart';
-import 'package:lafz/features/wallpapers/widgets/wallpaper_renderer_widget.dart'; // adjust path if needed
+import 'package:lafz/core/utils/wallpaper_capture.dart';
 import 'package:lafz/native/native_bridge.dart';
 
 class AutomationHealthScreen extends ConsumerStatefulWidget {
@@ -70,58 +64,6 @@ class _AutomationHealthScreenState
       );
   }
 
-  Future<Uint8List?> _renderWallpaperPng(
-    QuoteModel quote,
-    WallpaperSettingsModel style,
-  ) async {
-    final overlay = Overlay.maybeOf(context, rootOverlay: true);
-    if (overlay == null) return null;
-
-    final media = MediaQuery.of(context);
-    final size = media.size;
-    final key = GlobalKey();
-
-    final entry = OverlayEntry(
-      builder: (_) => Positioned(
-        left: -size.width * 3, // off-screen, but still laid out and painted
-        top: 0,
-        width: size.width,
-        height: size.height,
-        child: IgnorePointer(
-          child: RepaintBoundary(
-            key: key,
-            child: WallpaperRendererWidget(
-              quote: quote,
-              settings: style,
-              showLockScreenOverlay: false,
-              showHomeScreenOverlay: false,
-            ),
-          ),
-        ),
-      ),
-    );
-
-    overlay.insert(entry);
-    try {
-      // Let it lay out and paint, and let Google Fonts finish loading.
-      await WidgetsBinding.instance.endOfFrame;
-      await GoogleFonts.pendingFonts();
-      await WidgetsBinding.instance.endOfFrame;
-
-      final boundary =
-          key.currentContext?.findRenderObject() as RenderRepaintBoundary?;
-      if (boundary == null || boundary.size.isEmpty) return null;
-
-      final image = await boundary.toImage(pixelRatio: media.devicePixelRatio);
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      return byteData?.buffer.asUint8List();
-    } catch (_) {
-      return null;
-    } finally {
-      entry.remove();
-    }
-  }
-
   Future<void> _testImmediateRotation(SurfaceType surface) async {
     if (_rotatingSurface != null) return;
     setState(() => _rotatingSurface = surface);
@@ -148,9 +90,14 @@ class _AutomationHealthScreenState
         final style = await ref
             .read(settingsRepositoryProvider)
             .getWallpaperSettings();
-        if (mounted) setState(() => _wallpaperStyle = style);
+        if (!mounted) return;
+        setState(() => _wallpaperStyle = style);
 
-        final bytes = await _renderWallpaperPng(quote, style);
+        final bytes = await WallpaperCapture.renderQuoteToPng(
+          context,
+          quote,
+          style,
+        );
 
         if (bytes == null) {
           _snack(

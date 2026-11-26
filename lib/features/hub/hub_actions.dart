@@ -1,16 +1,11 @@
 import 'dart:math';
-import 'dart:typed_data';
-import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lafz/core/enums/enums.dart';
 import 'package:lafz/core/models/quote.dart';
-import 'package:lafz/core/models/wallpaper_settings.dart';
 import 'package:lafz/core/providers/providers.dart';
-import 'package:lafz/features/wallpapers/widgets/wallpaper_renderer_widget.dart';
+import 'package:lafz/core/utils/wallpaper_capture.dart';
 import 'package:lafz/native/native_bridge.dart';
 
 /// The five quick actions. Each returns a short message describing the result.
@@ -103,7 +98,7 @@ class HubActions {
     final style = await ref.read(settingsRepositoryProvider).getWallpaperSettings();
     if (!context.mounted) return 'Cancelled';
 
-    final bytes = await _renderPng(context, quote, style);
+    final bytes = await WallpaperCapture.renderQuoteToPng(context, quote, style);
     if (bytes == null) return 'Could not render the wallpaper.';
 
     final ok = await NativeBridge.applyWallpaper(
@@ -113,59 +108,5 @@ class HubActions {
     return ok
         ? 'Wallpaper set ($source): "${quote.text}"'
         : 'The system blocked setting the wallpaper.';
-  }
-
-  /// Draws WallpaperRendererWidget off-screen at the phone's real size and
-  /// returns PNG bytes.
-  static Future<Uint8List?> _renderPng(
-    BuildContext context,
-    QuoteModel quote,
-    WallpaperSettingsModel style,
-  ) async {
-    final overlay = Overlay.maybeOf(context, rootOverlay: true);
-    if (overlay == null) return null;
-
-    final media = MediaQuery.of(context);
-    final size = media.size;
-    final key = GlobalKey();
-
-    final entry = OverlayEntry(
-      builder: (_) => Positioned(
-        left: -size.width * 3,
-        top: 0,
-        width: size.width,
-        height: size.height,
-        child: IgnorePointer(
-          child: RepaintBoundary(
-            key: key,
-            child: WallpaperRendererWidget(
-              quote: quote,
-              settings: style,
-              showLockScreenOverlay: false,
-              showHomeScreenOverlay: false,
-            ),
-          ),
-        ),
-      ),
-    );
-
-    overlay.insert(entry);
-    try {
-      await WidgetsBinding.instance.endOfFrame;
-      await GoogleFonts.pendingFonts();
-      await WidgetsBinding.instance.endOfFrame;
-
-      final boundary =
-          key.currentContext?.findRenderObject() as RenderRepaintBoundary?;
-      if (boundary == null || boundary.size.isEmpty) return null;
-
-      final image = await boundary.toImage(pixelRatio: media.devicePixelRatio);
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      return byteData?.buffer.asUint8List();
-    } catch (_) {
-      return null;
-    } finally {
-      entry.remove();
-    }
   }
 }

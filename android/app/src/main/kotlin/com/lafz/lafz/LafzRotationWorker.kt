@@ -135,14 +135,16 @@ class LafzRotationWorker(
     }
 
     private fun renderAndSetWallpaper(quoteText: String, attribution: String) {
+        var bitmap: Bitmap? = null
         try {
             val wm = WallpaperManager.getInstance(context)
             val displayMetrics = context.resources.displayMetrics
             val width = if (wm.desiredMinimumWidth > 0) wm.desiredMinimumWidth else displayMetrics.widthPixels
             val height = if (wm.desiredMinimumHeight > 0) wm.desiredMinimumHeight else displayMetrics.heightPixels
 
-            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(bitmap)
+            val bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            bitmap = bmp
+            val canvas = Canvas(bmp)
 
             val bgPaint = Paint().apply {
                 color = Color.parseColor("#121417")
@@ -191,11 +193,13 @@ class LafzRotationWorker(
             canvas.drawText("— $attribution", (width / 2).toFloat(), textY + textLayout.height + (width * 0.08f), attrPaint)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                wm.setBitmap(bitmap, null, true, WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK)
+                wm.setBitmap(bmp, null, true, WallpaperManager.FLAG_SYSTEM or WallpaperManager.FLAG_LOCK)
             } else {
-                wm.setBitmap(bitmap)
+                wm.setBitmap(bmp)
             }
         } catch (_: Exception) {
+        } finally {
+            bitmap?.recycle()
         }
     }
 }

@@ -1,16 +1,11 @@
 import 'dart:math';
-import 'dart:typed_data';
-import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:lafz/core/enums/enums.dart';
 import 'package:lafz/core/models/quote.dart';
-import 'package:lafz/core/models/wallpaper_settings.dart';
 import 'package:lafz/core/providers/providers.dart';
-import 'package:lafz/features/wallpapers/widgets/wallpaper_renderer_widget.dart';
+import 'package:lafz/core/utils/wallpaper_capture.dart';
 import 'package:lafz/native/native_bridge.dart';
 
 /// An Apple HIG-styled Quick Rotation Hub Widget.
@@ -36,69 +31,19 @@ class _RotationHubWidgetState extends ConsumerState<RotationHubWidget> {
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-        SnackBar(
-          content: Text(message),
-          duration: const Duration(seconds: 3),
-        ),
+        SnackBar(content: Text(message), duration: const Duration(seconds: 3)),
       );
   }
 
-  Future<Uint8List?> _renderWallpaperPng(
+  Future<void> _applyWallpaperForQuote(
     QuoteModel quote,
-    WallpaperSettingsModel style,
+    String sourceLabel,
   ) async {
-    final overlay = Overlay.maybeOf(context, rootOverlay: true);
-    if (overlay == null) return null;
-
-    final media = MediaQuery.of(context);
-    final size = media.size;
-    final key = GlobalKey();
-
-    final entry = OverlayEntry(
-      builder: (_) => Positioned(
-        left: -size.width * 3,
-        top: 0,
-        width: size.width,
-        height: size.height,
-        child: IgnorePointer(
-          child: RepaintBoundary(
-            key: key,
-            child: WallpaperRendererWidget(
-              quote: quote,
-              settings: style,
-              showLockScreenOverlay: false,
-              showHomeScreenOverlay: false,
-            ),
-          ),
-        ),
-      ),
-    );
-
-    overlay.insert(entry);
-    try {
-      await WidgetsBinding.instance.endOfFrame;
-      await GoogleFonts.pendingFonts();
-      await WidgetsBinding.instance.endOfFrame;
-
-      final boundary =
-          key.currentContext?.findRenderObject() as RenderRepaintBoundary?;
-      if (boundary == null || boundary.size.isEmpty) return null;
-
-      final image = await boundary.toImage(pixelRatio: media.devicePixelRatio);
-      final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-      return byteData?.buffer.asUint8List();
-    } catch (_) {
-      return null;
-    } finally {
-      entry.remove();
-    }
-  }
-
-  Future<void> _applyWallpaperForQuote(QuoteModel quote, String sourceLabel) async {
     final settingsRepo = ref.read(settingsRepositoryProvider);
     final style = await settingsRepo.getWallpaperSettings();
 
-    final bytes = await _renderWallpaperPng(quote, style);
+    if (!mounted) return;
+    final bytes = await WallpaperCapture.renderQuoteToPng(context, quote, style);
     if (bytes != null) {
       final ok = await NativeBridge.applyWallpaper(
         imageBytes: bytes,
@@ -220,7 +165,8 @@ class _RotationHubWidgetState extends ConsumerState<RotationHubWidget> {
       final rotRepo = ref.read(rotationRepositoryProvider);
       final qRepo = ref.read(quotesRepositoryProvider);
 
-      final quote = await rotRepo.rotateNow(SurfaceType.wallpaper) ??
+      final quote =
+          await rotRepo.rotateNow(SurfaceType.wallpaper) ??
           await qRepo.getRandomQuote();
 
       if (quote == null) {
@@ -272,7 +218,9 @@ class _RotationHubWidgetState extends ConsumerState<RotationHubWidget> {
                     Container(
                       padding: const EdgeInsets.all(6),
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.primary.withValues(alpha: 0.12),
+                        color: theme.colorScheme.primary.withValues(
+                          alpha: 0.12,
+                        ),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Icon(
