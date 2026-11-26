@@ -4,8 +4,8 @@
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.x-02569B?logo=flutter&logoColor=white)](https://flutter.dev)
 [![Dart](https://img.shields.io/badge/Dart-3.x-0175C2?logo=dart&logoColor=white)](https://dart.dev)
-[![Architecture](https://img.shields.io/badge/Architecture-Local--First%20%7C%20Riverpod-teal)](#architecture)
-[![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20%7C%20Desktop-lightgrey)](#platform-support)
+[![Architecture](https://img.shields.io/badge/Architecture-Local--First%20%7C%20Riverpod-teal)](#architecture--technology-stack)
+[![Platform](https://img.shields.io/badge/Platform-Android%20%7C%20iOS%20%7C%20Desktop-lightgrey)](#getting-started--setup-guide)
 [![License](https://img.shields.io/badge/License-Proprietary-blue.svg)](#license)
 
 **Lafz** (Arabic: لفظ, meaning *word* or *articulated speech*) is an ambient, local-first mobile companion designed to turn your curated wisdom, principles, and scripture into persistent visual reminders across your daily digital environments — without requiring you to spend hours inside an app.
@@ -16,33 +16,23 @@ Instead of feeds, algorithms, or intrusive notifications, Lafz brings meaning di
 
 ## 🎬 Demo & Screenshots
 
-### Video Walkthrough
-<!-- 
-  TODO: Replace the link/image below with an MP4 video or demo GIF preview.
-  Example: <video src="assets/docs/demo.mp4" controls width="100%"></video>
-  Or hosted: [![Watch Demo](https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)
--->
-<p align="center">
-  <a href="docs/media/demo_video.mp4">
-    <img src="docs/media/video_placeholder.png" alt="Watch Demo Video" width="85%" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);" />
-  </a>
-  <br>
-  <em>▶️ Click above to watch the full demo video showcasing wallpaper generation, rotation, and widgets.</em>
-</p>
-
 ### Screenshots Gallery
 
-<!-- TODO: Place your device screenshots in docs/screenshots/ and update paths below -->
-
-| **1. Browse & Reflection** | **2. Wallpaper Studio** | **3. Lock Screen Preview** |
+| **1. Home Screen** | **2. Automation & Health** | **3. Wallpaper Studio** |
 |:---:|:---:|:---:|
-| <img src="docs/screenshots/01_browse_screen.png" width="260" alt="Browse Screen" /> | <img src="docs/screenshots/02_wallpaper_studio.png" width="260" alt="Wallpaper Studio" /> | <img src="docs/screenshots/03_lockscreen_preview.png" width="260" alt="Lock Screen Preview" /> |
-| *Bilingual header & daily quote* | *8 presets, typography & palettes* | *Safe area margins & clock mock* |
+| <img src="assets/images/1.png" width="250" alt="Home Screen" /> | <img src="assets/images/2.png" width="250" alt="Automation Screen" /> | <img src="assets/images/3.png" width="250" alt="Wallpaper Studio Screen" /> |
+| *Daily quote feed & bilingual header* | *Background schedules & Doze status* | *8 presets, typography & safe zones* |
 
-| **4. Native Timeline Widget** | **5. Quick Rotation Hub** | **6. Automation Health** |
+| **4. Basic Timeline Widget** | **5. Quick Rotation Hub** | **6. Live Home Wallpaper** |
 |:---:|:---:|:---:|
-| <img src="docs/screenshots/04_timeline_widget.png" width="260" alt="Native Timeline Widget" /> | <img src="docs/screenshots/05_quick_rotation_hub.png" width="260" alt="Quick Rotation Hub" /> | <img src="docs/screenshots/06_automation_health.png" width="260" alt="Automation Health" /> |
-| *Home-screen ambient quote tile* | *5-tile native control remote* | *WorkManager & battery status* |
+| <img src="assets/images/4.png" width="250" alt="Basic Widget" /> | <img src="assets/images/5.png" width="250" alt="Widget Hub" /> | <img src="assets/images/6.png" width="250" alt="Wallpaper Screen - Home Screen" /> |
+| *Ambient home-screen quote tile* | *5-tile native control remote* | *Rendered wallpaper with icon grid* |
+
+<p align="center">
+  <strong>7. Basic Widget Customization</strong><br>
+  <img src="assets/images/7.png" width="250" alt="Basic Widget Edit Screen" /><br>
+  <em>Live palette, font & layout controls</em>
+</p>
 
 ---
 
@@ -98,7 +88,7 @@ Explore an authentic, hierarchical taxonomy covering:
 
 Lafz follows a modular, feature-first architecture that cleanly separates pure domain logic from Flutter presentation and platform-specific native layers:
 
-```
+```text
 ┌─────────────────────────────────────────────────────────────┐
 │                       FLUTTER APP                           │
 │  ┌─────────────────┐ ┌─────────────────┐ ┌───────────────┐  │

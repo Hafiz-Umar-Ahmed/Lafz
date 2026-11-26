@@ -5,7 +5,7 @@
     "description": "Baseline launch package with 150+ verified quotes across Islam, Philosophy, and Modern Focus",
     "published_at": "2026-11-19T00:00:00Z",
     "quote_count": 213,
-    "personality_count": 19,
+    "personality_count": 20,
     "category_count": 13,
     "background_count": 8,
     "checksum": "a511799d699ccbbb435730629540da138fd0df62322ab5ae7321ac05b76f77fc"
@@ -195,6 +195,14 @@
       "tier": "free"
     },
     {
+      "id": 109,
+      "name": "The Holy Quran",
+      "category_id": 10,
+      "description": "The divine word of Allah, sacred scripture of Islam revealed to Prophet Muhammad (ﷺ)",
+      "publication_status": "published",
+      "tier": "free"
+    },
+    {
       "id": 201,
       "name": "Marcus Aurelius",
       "category_id": 20,
@@ -370,7 +378,7 @@
       "id": 1,
       "text": "Verily, with hardship comes ease.",
       "attribution": "The Holy Quran",
-      "personality_id": 101,
+      "personality_id": 109,
       "category_ids": [
         1,
         10
@@ -409,7 +417,7 @@
       "id": 2,
       "text": "And He found you lost and guided you.",
       "attribution": "The Holy Quran",
-      "personality_id": 101,
+      "personality_id": 109,
       "category_ids": [
         1,
         10
@@ -448,7 +456,7 @@
       "id": 3,
       "text": "And speak to people with goodness.",
       "attribution": "The Holy Quran",
-      "personality_id": 101,
+      "personality_id": 109,
       "category_ids": [
         1,
         10
@@ -487,7 +495,7 @@
       "id": 4,
       "text": "Unquestionably, by the remembrance of Allah hearts are assured.",
       "attribution": "The Holy Quran",
-      "personality_id": 101,
+      "personality_id": 109,
       "category_ids": [
         1,
         10
@@ -526,7 +534,7 @@
       "id": 5,
       "text": "And whoever relies upon Allah - then He is sufficient for him.",
       "attribution": "The Holy Quran",
-      "personality_id": 101,
+      "personality_id": 109,
       "category_ids": [
         1,
         10
@@ -565,7 +573,7 @@
       "id": 6,
       "text": "And We have not sent you, [O Muhammad], except as a mercy to the worlds.",
       "attribution": "The Holy Quran",
-      "personality_id": 101,
+      "personality_id": 109,
       "category_ids": [
         1,
         10
@@ -604,7 +612,7 @@
       "id": 7,
       "text": "Indeed, Allah will not change the condition of a people until they change what is in themselves.",
       "attribution": "The Holy Quran",
-      "personality_id": 101,
+      "personality_id": 109,
       "category_ids": [
         1,
         10
@@ -643,7 +651,7 @@
       "id": 8,
       "text": "So remember Me; I will remember you. And be grateful to Me and do not deny Me.",
       "attribution": "The Holy Quran",
-      "personality_id": 101,
+      "personality_id": 109,
       "category_ids": [
         1,
         10
@@ -682,7 +690,7 @@
       "id": 9,
       "text": "My mercy encompasses all things.",
       "attribution": "The Holy Quran",
-      "personality_id": 101,
+      "personality_id": 109,
       "category_ids": [
         1,
         10
@@ -721,7 +729,7 @@
       "id": 10,
       "text": "And hold firmly to the rope of Allah all together and do not become divided.",
       "attribution": "The Holy Quran",
-      "personality_id": 101,
+      "personality_id": 109,
       "category_ids": [
         1,
         10
@@ -4152,7 +4160,7 @@
       "id": 108,
       "text": "And He is with you wherever you are.",
       "attribution": "The Holy Quran",
-      "personality_id": 101,
+      "personality_id": 109,
       "category_ids": [
         1,
         10
@@ -4191,7 +4199,7 @@
       "id": 109,
       "text": "Call upon Me; I will respond to you.",
       "attribution": "The Holy Quran",
-      "personality_id": 101,
+      "personality_id": 109,
       "category_ids": [
         1,
         10
@@ -4230,7 +4238,7 @@
       "id": 110,
       "text": "Indeed, what is to come will be better for you than what has gone by.",
       "attribution": "The Holy Quran",
-      "personality_id": 101,
+      "personality_id": 109,
       "category_ids": [
         1,
         10
@@ -4269,7 +4277,7 @@
       "id": 111,
       "text": "And put your trust in the Living who does not die.",
       "attribution": "The Holy Quran",
-      "personality_id": 101,
+      "personality_id": 109,
       "category_ids": [
         1,
         10
@@ -4308,7 +4316,7 @@
       "id": 112,
       "text": "Allah does not burden a soul beyond that it can bear.",
       "attribution": "The Holy Quran",
-      "personality_id": 101,
+      "personality_id": 109,
       "category_ids": [
         1,
         10
@@ -4347,7 +4355,7 @@
       "id": 113,
       "text": "Indeed, my Lord is near and responsive.",
       "attribution": "The Holy Quran",
-      "personality_id": 101,
+      "personality_id": 109,
       "category_ids": [
         1,
         10
@@ -4386,7 +4394,7 @@
       "id": 114,
       "text": "And never say of anything, 'Indeed, I will do that tomorrow,' except [when adding], 'If Allah wills.'",
       "attribution": "The Holy Quran",
-      "personality_id": 101,
+      "personality_id": 109,
       "category_ids": [
         1,
         10
@@ -4425,7 +4433,7 @@
       "id": 115,
       "text": "And whoever fears Allah - He will make for him a way out.",
       "attribution": "The Holy Quran",
-      "personality_id": 101,
+      "personality_id": 109,
       "category_ids": [
         1,
         10
@@ -4464,7 +4472,7 @@
       "id": 116,
       "text": "And be patient, for indeed, Allah does not allow to be lost the reward of those who do good.",
       "attribution": "The Holy Quran",
-      "personality_id": 101,
+      "personality_id": 109,
       "category_ids": [
         1,
         10
@@ -4503,7 +4511,7 @@
       "id": 117,
       "text": "Is not Allah sufficient for His servant?",
       "attribution": "The Holy Quran",
-      "personality_id": 101,
+      "personality_id": 109,
       "category_ids": [
         1,
         10

@@ -4,7 +4,7 @@ abstract final class AppConstants {
   
   // Database & Content
   static const String dbName = 'lafz.db';
-  static const int currentSchemaVersion = 1;
+  static const int currentSchemaVersion = 2;
   static const String contentPackageDir = 'content';
   static const String baselinePackageAsset = 'assets/content/baseline_content.json';
   

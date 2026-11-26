@@ -87,7 +87,7 @@ void main() {
         id: 1,
         text: 'Verily, with hardship comes ease.',
         attribution: 'The Holy Quran',
-        personalityId: 101,
+        personalityId: 109,
         surah: 94,
         ayah: 6,
         originalText: 'إِنَّ مَعَ الْعُسْرِ يُسْرًا',

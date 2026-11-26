@@ -29,9 +29,7 @@ class _AutomationHealthScreenState
   RotationSettingsModel? _wallpaperSettings;
   WallpaperSettingsModel? _wallpaperStyle;
   Map<String, dynamic> _batteryStatus = {};
-  Map<String, dynamic> _workManagerStatus = {};
   bool _isLoading = true;
-  bool _isTestingWorker = false;
   SurfaceType? _rotatingSurface;
 
   @override
@@ -48,7 +46,6 @@ class _AutomationHealthScreenState
     final wpSettings = await rotRepo.getRotationSettings(SurfaceType.wallpaper);
     final wpStyle = await settingsRepo.getWallpaperSettings();
     final battery = await NativeBridge.checkAutomationHealth();
-    final worker = await NativeBridge.getWorkManagerStatus();
 
     if (mounted) {
       setState(() {
@@ -56,40 +53,8 @@ class _AutomationHealthScreenState
         _wallpaperSettings = wpSettings;
         _wallpaperStyle = wpStyle;
         _batteryStatus = battery;
-        _workManagerStatus = worker;
         _isLoading = false;
       });
-    }
-  }
-
-  Future<void> _testWorkManager() async {
-    if (_isTestingWorker) return;
-    setState(() => _isTestingWorker = true);
-    try {
-      final success = await NativeBridge.triggerWorkManagerNow();
-      await Future.delayed(const Duration(milliseconds: 1000));
-      final updated = await NativeBridge.getWorkManagerStatus();
-      if (mounted) {
-        setState(() {
-          _workManagerStatus = updated;
-          _isTestingWorker = false;
-        });
-        final lastQuote = updated['lastQuote'] as String?;
-        final lastAttr = updated['lastAttribution'] as String?;
-        if (lastQuote != null && lastQuote.isNotEmpty) {
-          _snack('Native WorkManager ran successfully: “$lastQuote” — $lastAttr');
-        } else if (success) {
-          _snack('Native WorkManager triggered successfully in background!');
-        } else {
-          _snack('WorkManager trigger completed.');
-        }
-        await _loadHealthData();
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _isTestingWorker = false);
-        _snack('WorkManager test error: $e');
-      }
     }
   }
 
@@ -491,78 +456,6 @@ class _AutomationHealthScreenState
           const SizedBox(height: 20),
 
           // 5. Native Android WorkManager Engine Card
-          const Text(
-            'Native WorkManager Engine',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildHealthRow(
-                    'Engine',
-                    'AndroidX WorkManager (Headless Background Worker)',
-                  ),
-                  _buildHealthRow(
-                    'Execution Mode',
-                    'Periodic & On-Demand Headless Execution',
-                  ),
-                  _buildHealthRow(
-                    'Worker Target',
-                    'com.lafz.lafz.LafzRotationWorker',
-                  ),
-                  _buildHealthRow(
-                    'Status',
-                    _workManagerStatus['lastStatus'] as String? ?? 'ACTIVE',
-                  ),
-                  if (_workManagerStatus['lastRunTimestamp'] != null &&
-                      (_workManagerStatus['lastRunTimestamp'] as num) > 0)
-                    _buildHealthRow(
-                      'Last Worker Run',
-                      dateFormat.format(
-                        DateTime.fromMillisecondsSinceEpoch(
-                          (_workManagerStatus['lastRunTimestamp'] as num).toInt(),
-                        ),
-                      ),
-                    ),
-                  if (_workManagerStatus['lastQuote'] != null) ...[
-                    const Divider(height: 18),
-                    Text(
-                      'Last Rotated Quote: “${_workManagerStatus['lastQuote']}” — ${_workManagerStatus['lastAttribution'] ?? ''}',
-                      style: const TextStyle(
-                        fontSize: 12.5,
-                        fontStyle: FontStyle.italic,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.tonalIcon(
-                      onPressed: _isTestingWorker ? null : _testWorkManager,
-                      icon: _isTestingWorker
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(Icons.bolt, size: 18),
-                      label: Text(
-                        _isTestingWorker
-                            ? 'Triggering Headless Worker...'
-                            : 'Test Native WorkManager (Immediate Run)',
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 32),
         ],
       ),
     );

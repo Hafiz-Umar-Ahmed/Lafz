@@ -43,6 +43,8 @@ class DatabaseHelper {
       final count = (res.first['count'] as num?)?.toInt() ?? 0;
       if (count == 0) {
         await _seedBaselineContent(db);
+      } else {
+        await _migrateQuranPersonality(db);
       }
     } catch (_) {}
   }
@@ -265,6 +267,24 @@ class DatabaseHelper {
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     // Versioned migrations per NFR-03
+    if (oldVersion < 2) {
+      await _migrateQuranPersonality(db);
+    }
+  }
+
+  Future<void> _migrateQuranPersonality(Database db) async {
+    try {
+      await db.execute('''
+        INSERT OR IGNORE INTO personalities (id, name, description, category_id, publication_status, tier)
+        VALUES (109, 'The Holy Quran', 'The divine word of Allah, sacred scripture of Islam revealed to Prophet Muhammad (ﷺ)', 10, 'published', 'free')
+      ''');
+
+      await db.rawUpdate('''
+        UPDATE quotes 
+        SET personality_id = 109 
+        WHERE attribution = 'The Holy Quran' AND personality_id = 101
+      ''');
+    } catch (_) {}
   }
 
   Future<void> _seedBaselineContent(Database db) async {
